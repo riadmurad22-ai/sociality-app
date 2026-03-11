@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import Timeline from "./pages/main/Timeline"; // Pastikan file ini ada di src/pages/main/Timeline.tsx
-import Profile from "./pages/main/Profile"; // Pastikan import ini ada
+import Timeline from "./pages/main/Timeline";
+import Profile from "./pages/main/Profile";
+import Search from "./pages/main/Search";
 
 function App() {
   return (
@@ -11,8 +12,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/timeline" element={<Timeline />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>
   );

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { registerSchema, RegisterInput } from "@/schemas/auth";
@@ -63,7 +63,11 @@ export default function RegisterPage() {
         {/* Header / Logo */}
         <div className="flex flex-col items-center justify-center text-center gap-2 mb-1">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-white" />
+            <img
+              src="/logo.png"
+              alt="Sociality Logo"
+              className="w-5 h-5 object-contain"
+            />
             <span className="font-bold text-lg tracking-tight">Sociality</span>
           </div>
           <h1 className="text-xl font-bold tracking-tight mt-1">Register</h1>

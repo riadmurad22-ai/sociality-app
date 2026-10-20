@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { loginSchema, LoginInput } from "@/schemas/auth";
@@ -32,15 +32,13 @@ export default function LoginPage() {
     setErrorMessage(null);
 
     try {
-      const response = await api.post("/api/auth/login", data);
-      const { token } = response.data;
+      // Sesuai endpoint API /api/auth/login
+      await api.post("/api/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
 
-      // Simpan token ke localStorage
-      if (token) {
-        localStorage.setItem("token", token);
-      }
-
-      // Redirect ke Feed setelah login berhasil
+      // Setelah sukses, arahkan ke halaman feed
       router.push("/feed");
     } catch (error: any) {
       const msg =
@@ -57,23 +55,25 @@ export default function LoginPage() {
       {/* Efek Gradient / Glow Ungu di Bagian Bawah */}
       <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-112.5 h-75 bg-purple-600/40 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Card Form Utama (Presisi sesuai Figma) */}
-      <div className="relative z-10 w-full max-w-86.25 bg-black/40 backdrop-blur-md rounded-[16px] border border-white/10 p-[32px_16px] flex flex-col gap-4 shadow-2xl">
+      {/* Card Form Utama */}
+      <div className="relative z-10 w-full max-w-86.25 bg-black/40 backdrop-blur-md rounded-[16px] border border-white/10 p-[32px_16px] flex flex-col gap-4 shadow-2xl my-8">
         {/* Header / Logo */}
-        <div className="flex flex-col items-center justify-center text-center gap-2 mb-2">
+        <div className="flex flex-col items-center justify-center text-center gap-2 mb-1">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-white" />
-            <span className="font-bold text-xl tracking-tight">Sociality</span>
+            <img
+              src="/logo.png"
+              alt="Sociality Logo"
+              className="w-5 h-5 object-contain"
+            />
+            <span className="font-bold text-lg tracking-tight">Sociality</span>
           </div>
-          <h1 className="text-xl font-bold tracking-tight mt-1">
-            Welcome Back!
-          </h1>
+          <h1 className="text-xl font-bold tracking-tight mt-1">Login</h1>
         </div>
 
         {/* Form Login */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
           {/* Field Email */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1">
             <Label
               htmlFor="email"
               className="text-xs font-semibold text-gray-200"
@@ -85,20 +85,20 @@ export default function LoginPage() {
               type="email"
               placeholder="Enter your email"
               {...register("email")}
-              className="bg-[#0D0E12] border-white/10 text-white placeholder:text-gray-500 rounded-lg h-11 focus-visible:ring-purple-500"
+              className="bg-[#0D0E12] border-white/10 text-white placeholder:text-gray-500 rounded-lg h-10 text-sm focus-visible:ring-purple-500"
             />
             {errors.email && (
-              <span className="text-xs text-red-500">
+              <span className="text-[11px] text-red-500">
                 {errors.email.message}
               </span>
             )}
           </div>
 
           {/* Field Password */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1">
             <Label
-              htmlFor="password font-semibold text-gray-200"
-              className="text-xs"
+              htmlFor="password"
+              className="text-xs font-semibold text-gray-200"
             >
               Password
             </Label>
@@ -108,7 +108,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 {...register("password")}
-                className="bg-[#0D0E12] border-white/10 text-white placeholder:text-gray-500 rounded-lg h-11 pr-10 focus-visible:ring-purple-500"
+                className="bg-[#0D0E12] border-white/10 text-white placeholder:text-gray-500 rounded-lg h-10 text-sm pr-9 focus-visible:ring-purple-500"
               />
               <button
                 type="button"
@@ -123,7 +123,7 @@ export default function LoginPage() {
               </button>
             </div>
             {errors.password && (
-              <span className="text-xs text-red-500">
+              <span className="text-[11px] text-red-500">
                 {errors.password.message}
               </span>
             )}
@@ -136,18 +136,18 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Tombol Submit Login */}
+          {/* Tombol Submit */}
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white font-medium rounded-full h-11 mt-2 transition-all"
+            className="w-full bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white font-medium rounded-full h-10 mt-2 transition-all"
           >
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? "Processing..." : "Submit"}
           </Button>
         </form>
 
         {/* Footer / Link ke Register */}
-        <div className="text-center text-xs text-gray-300 mt-2">
+        <div className="text-center text-xs text-gray-300 mt-1">
           Don't have an account?{" "}
           <Link
             href="/register"

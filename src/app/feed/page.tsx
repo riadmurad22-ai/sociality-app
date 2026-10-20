@@ -6,7 +6,6 @@ import {
   MessageCircle,
   Bookmark,
   Share2,
-  Sparkles,
   Home,
   Search,
   PlusSquare,
@@ -134,10 +133,14 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center pb-24">
-      {/* Header / Navbar Atas (Presisi tinggi Figma: h-[80px], border border-[#181D27]) */}
+      {/* Header / Navbar Atas dengan logo.png */}
       <header className="w-full h-20 sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#181D27] px-6 md:px-30 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-purple-500" />
+          <img
+            src="/logo.png"
+            alt="Sociality Logo"
+            className="w-6 h-6 object-contain"
+          />
           <span className="font-bold text-xl tracking-tight">Sociality</span>
         </div>
         <div className="flex items-center gap-4">
@@ -148,7 +151,7 @@ export default function FeedPage() {
         </div>
       </header>
 
-      {/* Main Timeline Feed Container (Lebar kontainer 600px sesuai Figma) */}
+      {/* Main Timeline Feed Container */}
       <main className="w-full max-w-150 flex flex-col gap-6 p-4 md:py-6">
         {posts.map((post) => (
           <div
@@ -234,7 +237,7 @@ export default function FeedPage() {
         ))}
       </main>
 
-      {/* Modal "Liked by" (Sesuai Screenshot Likes Figma) */}
+      {/* Modal "Liked by" */}
       {showLikesModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="w-full max-w-sm bg-[#0A0D12] border border-[#181D27] rounded-2xl p-5 flex flex-col gap-4 shadow-2xl">
@@ -285,7 +288,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {/* Bottom Navigation Bar (Menu Bawah Figma) */}
+      {/* Bottom Navigation Bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 bg-[#0A0D12]/95 backdrop-blur-md border-t border-[#181D27] py-3 px-6 flex items-center justify-around max-w-md mx-auto rounded-t-2xl shadow-lg">
         <button className="text-purple-500 flex flex-col items-center">
           <Home className="w-6 h-6" />

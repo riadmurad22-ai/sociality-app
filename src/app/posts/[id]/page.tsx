@@ -1,295 +1,261 @@
 "use client";
 
-import { useState } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Search,
-  Heart,
-  Bookmark,
-  MessageCircle,
-  Send,
-  Trash2,
-  Home,
-  PlusSquare,
-  User as UserIcon,
-  ArrowLeft,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import axios from "axios";
+import { ArrowLeft, Trash2, Heart, MessageCircle, Send } from "lucide-react";
 
-export default function PostDetailPage() {
+interface Comment {
+  id: string;
+  author: string;
+  avatar: string;
+  content: string;
+  createdAt: string;
+}
+
+interface Post {
+  id: string;
+  author: string;
+  avatar: string;
+  content: string;
+  image?: string;
+  likes: number;
+  commentsCount: number;
+  isLiked?: boolean;
+}
+
+function PostDetailContent() {
   const router = useRouter();
   const params = useParams();
   const postId = params.id;
 
-  // State untuk interaksi pos
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(42);
-  const [isSaved, setIsSaved] = useState(false);
-
-  // State untuk komentar
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "Sarah Connor",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
-      text: "Wih fotonya keren banget! Di mana ini lokasinya?",
-      time: "2h ago",
-    },
-    {
-      id: 2,
-      author: "Alex Turner",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
-      text: "Mantap dokumentasinya bro!",
-      time: "1h ago",
-    },
-  ]);
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleLikeToggle = () => {
-    if (isLiked) {
-      setIsLiked(false);
-      setLikeCount(likeCount - 1);
-    } else {
-      setIsLiked(true);
-      setLikeCount(likeCount + 1);
-    }
+  useEffect(() => {
+    if (!postId) return;
+
+    // Simulasi data fetch / API client sesuai MVP
+    // Anda bisa menggantinya dengan endpoint axios yang sebenarnya jika sudah ada
+    setPost({
+      id: String(postId),
+      author: "Janesmith",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      content:
+        "Digital creator & travel enthusiast ✨ Exploring the world one photo at a time.",
+      image:
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800",
+      likes: 312,
+      commentsCount: 2,
+      isLiked: false,
+    });
+
+    setComments([
+      {
+        id: "1",
+        author: "Alex Turner",
+        avatar:
+          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
+        content: "Amazing view! Where is this taken?",
+        createdAt: "2h ago",
+      },
+      {
+        id: "2",
+        author: "Sarah Jenkins",
+        avatar:
+          "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150",
+        content: "Love this vibe so much!",
+        createdAt: "1h ago",
+      },
+    ]);
+
+    setLoading(false);
+  }, [postId]);
+
+  const handleLike = () => {
+    if (!post) return;
+    setPost({
+      ...post,
+      likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+      isLiked: !post.isLiked,
+    });
   };
 
   const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    const commentObj = {
-      id: Date.now(),
-      author: "John Doe",
+    const commentItem: Comment = {
+      id: Date.now().toString(),
+      author: "You",
       avatar:
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
-      text: newComment,
-      time: "Just now",
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+      content: newComment,
+      createdAt: "Just now",
     };
 
-    setComments([...comments, commentObj]);
+    setComments([...comments, commentItem]);
     setNewComment("");
   };
 
-  const handleDeleteComment = (id: number) => {
-    setComments(comments.filter((c) => c.id !== id));
-  };
-
   const handleDeletePost = () => {
-    if (confirm("Apakah Anda yakin ingin menghapus postingan ini?")) {
-      // Sesuai endpoint DELETE /api/posts/{id}
+    if (confirm("Are you sure you want to delete this post?")) {
+      // Logic delete post
       router.push("/feed");
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        Post not found
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center pb-24">
-      {/* Header Atas */}
-      <header className="w-full h-20 sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#181D27] px-6 md:px-30 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img
-            src="/logo.png"
-            alt="Sociality Logo"
-            className="w-6 h-6 object-contain"
-          />
-          <span className="font-bold text-xl tracking-tight">Sociality</span>
-        </div>
-
-        <div className="hidden md:flex items-center bg-[#0D0E12] border border-white/10 rounded-full px-4 py-2 w-72">
-          <Search className="w-4 h-4 text-gray-400 mr-2" />
-          <input
-            type="text"
-            placeholder="Search"
-            className="bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none w-full"
-          />
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Avatar className="w-10 h-10 border border-white/20">
-            <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" />
-            <AvatarFallback>ME</AvatarFallback>
-          </Avatar>
-        </div>
+    <div className="min-h-screen bg-black text-white pb-20">
+      {/* Header */}
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-800 bg-black/80 px-4 py-3 backdrop-blur">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-zinc-400 hover:text-white transition"
+        >
+          <ArrowLeft size={20} />
+          <span>Back</span>
+        </button>
+        <h1 className="font-semibold">Post</h1>
+        <button
+          onClick={handleDeletePost}
+          className="text-red-500 hover:text-red-400 transition"
+        >
+          <Trash2 size={20} />
+        </button>
       </header>
 
-      {/* Main Container Post Detail */}
-      <main className="w-full max-w-170 flex flex-col gap-4 p-4 mt-4">
-        {/* Tombol Kembali & Delete Post (jika owner) */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="text-gray-400 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back
-          </button>
-
-          <button
-            onClick={handleDeletePost}
-            className="text-red-400 hover:text-red-300 text-xs font-semibold flex items-center gap-1 transition-colors bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-lg"
-          >
-            <Trash2 className="w-3.5 h-3.5" /> Delete Post
-          </button>
+      {/* Main Post Container */}
+      <main className="mx-auto max-w-xl p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <Image
+            src={post.avatar}
+            alt={post.author}
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+          />
+          <div>
+            <h3 className="font-semibold text-sm">{post.author}</h3>
+            <span className="text-xs text-zinc-500">2h ago</span>
+          </div>
         </div>
 
-        {/* Post Card Detail */}
-        <div className="bg-[#0D0E12] border border-white/10 rounded-2xl overflow-hidden shadow-xl flex flex-col">
-          {/* Author Header */}
-          <div className="p-4 flex items-center justify-between border-b border-white/5">
-            <div className="flex items-center gap-3">
-              <Avatar className="w-9 h-9 border border-white/10">
-                <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="text-xs font-bold">John Doe</h3>
-                <span className="text-[10px] text-gray-400">2 hours ago</span>
-              </div>
-            </div>
-          </div>
+        <p className="text-sm text-zinc-200 mb-4">{post.content}</p>
 
-          {/* Large Image View */}
-          <div className="w-full bg-black max-h-125 flex items-center justify-center overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&h=800&fit=crop"
-              alt="Post Detail"
-              className="w-full h-full object-cover"
+        {post.image && (
+          <div className="relative mb-4 h-80 w-full overflow-hidden rounded-xl bg-zinc-900">
+            <Image
+              src={post.image}
+              alt="Post content"
+              fill
+              className="object-cover"
             />
           </div>
+        )}
 
-          {/* Actions & Counts */}
-          <div className="p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={handleLikeToggle}
-                  className="flex items-center gap-1.5 text-xs text-gray-300 hover:text-white transition-colors"
-                >
-                  <Heart
-                    className={`w-5 h-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
-                  />
-                  <span>{likeCount}</span>
-                </button>
-                <div className="flex items-center gap-1.5 text-xs text-gray-300">
-                  <MessageCircle className="w-5 h-5" />
-                  <span>{comments.length}</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsSaved(!isSaved)}
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                <Bookmark
-                  className={`w-5 h-5 ${isSaved ? "fill-white text-white" : ""}`}
-                />
-              </button>
-            </div>
-
-            {/* Caption */}
-            <p className="text-xs text-gray-200 leading-relaxed">
-              <span className="font-bold mr-2">johndoe</span>
-              Creating unforgettable moments with my favorite person! 📸 Let's
-              cherish every second together!
-            </p>
+        {/* Actions Count */}
+        <div className="flex items-center gap-6 border-b border-zinc-800 py-3 text-sm text-zinc-400">
+          <button
+            onClick={handleLike}
+            className={`flex items-center gap-2 transition ${post.isLiked ? "text-red-500" : "hover:text-white"}`}
+          >
+            <Heart size={18} className={post.isLiked ? "fill-current" : ""} />
+            <span>{post.likes} Likes</span>
+          </button>
+          <div className="flex items-center gap-2">
+            <MessageCircle size={18} />
+            <span>{comments.length} Comments</span>
           </div>
+        </div>
 
-          {/* Comments Section */}
-          <div className="border-t border-white/10 p-4 flex flex-col gap-4 bg-black/30">
-            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider">
-              Comments
-            </h4>
+        {/* Comments Section */}
+        <div className="mt-4 space-y-4">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+            Comments
+          </h4>
 
-            {/* List Comments */}
-            <div className="flex flex-col gap-3 max-h-64 overflow-y-auto pr-1">
-              {comments.length === 0 ? (
-                <p className="text-xs text-gray-500 text-center py-4">
-                  No comments yet. Be the first to comment!
-                </p>
-              ) : (
-                comments.map((comment) => (
-                  <div
-                    key={comment.id}
-                    className="flex items-start justify-between gap-3 text-xs bg-black/40 p-2.5 rounded-xl border border-white/5"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <Avatar className="w-7 h-7 mt-0.5">
-                        <AvatarImage src={comment.avatar} />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-gray-200">
-                            {comment.author}
-                          </span>
-                          <span className="text-[10px] text-gray-500">
-                            {comment.time}
-                          </span>
-                        </div>
-                        <p className="text-gray-300 mt-0.5">{comment.text}</p>
-                      </div>
-                    </div>
-                    {/* Tombol Delete Comment (jika owner komentar) */}
-                    <button
-                      onClick={() => handleDeleteComment(comment.id)}
-                      className="text-gray-500 hover:text-red-400 p-1 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Comment Composer */}
-            <form
-              onSubmit={handleAddComment}
-              className="flex items-center gap-2 mt-2"
+          {comments.map((comment) => (
+            <div
+              key={comment.id}
+              className="flex items-start gap-3 border-b border-zinc-900 pb-3"
             >
-              <Input
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Write a comment..."
-                className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 rounded-xl h-10 text-xs focus-visible:ring-purple-500"
+              <Image
+                src={comment.avatar}
+                alt={comment.author}
+                width={32}
+                height={32}
+                className="rounded-full object-cover"
               />
-              <Button
-                type="submit"
-                className="bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white h-10 px-4 rounded-xl shrink-0 transition-all"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
-          </div>
+              <div className="flex-1 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold">{comment.author}</span>
+                  <span className="text-xs text-zinc-500">
+                    {comment.createdAt}
+                  </span>
+                </div>
+                <p className="text-zinc-300 mt-1">{comment.content}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
 
-      {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-[#0A0D12]/95 backdrop-blur-md border-t border-[#181D27] py-3 px-6 flex items-center justify-around max-w-md mx-auto rounded-t-2xl shadow-lg">
-        <button
-          onClick={() => router.push("/feed")}
-          className="text-gray-400 hover:text-white flex flex-col items-center"
+      {/* Comment Composer Footer */}
+      <footer className="fixed bottom-0 left-0 right-0 border-t border-zinc-800 bg-black p-3">
+        <form
+          onSubmit={handleAddComment}
+          className="mx-auto flex max-w-xl items-center gap-2"
         >
-          <Home className="w-6 h-6" />
-        </button>
-        <button className="text-gray-400 hover:text-white flex flex-col items-center">
-          <Search className="w-6 h-6" />
-        </button>
-        <button
-          onClick={() => router.push("/create")}
-          className="text-gray-400 hover:text-white flex flex-col items-center"
-        >
-          <PlusSquare className="w-6 h-6" />
-        </button>
-        <button
-          onClick={() => router.push("/profile")}
-          className="text-gray-400 hover:text-white flex flex-col items-center"
-        >
-          <UserIcon className="w-6 h-6" />
-        </button>
-      </nav>
+          <input
+            type="text"
+            placeholder="Write a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className="flex-1 rounded-full bg-zinc-900 px-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-700"
+          />
+          <button
+            type="submit"
+            className="rounded-full bg-white p-2 text-black hover:bg-zinc-200 transition"
+          >
+            <Send size={16} />
+          </button>
+        </form>
+      </footer>
     </div>
+  );
+}
+
+export default function PostDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <PostDetailContent />
+    </Suspense>
   );
 }

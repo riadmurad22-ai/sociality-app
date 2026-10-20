@@ -1,201 +1,194 @@
 "use client";
 
-import { useState } from "react";
+import React, { Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Search,
-  Home,
-  PlusSquare,
-  User as UserIcon,
-  Grid,
-  UserPlus,
-  UserCheck,
-  ArrowLeft,
-} from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { ArrowLeft, Search, Home, PlusSquare, User, Grid } from "lucide-react";
 
-export default function FriendsProfilePage() {
+function FriendsProfileContent() {
   const router = useRouter();
   const params = useParams();
-  const username = params.username as string;
+  const username = (params?.username as string) || "janesmith";
 
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followerCount, setFollowerCount] = useState(124);
+  const [isFollowing, setIsFollowing] = React.useState(true);
 
-  // Sample data postingan teman/user lain
-  const userPosts = [
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
-  ];
-
-  const handleFollowToggle = () => {
-    if (isFollowing) {
-      setIsFollowing(false);
-      setFollowerCount((prev) => prev - 1);
-    } else {
-      setIsFollowing(true);
-      setFollowerCount((prev) => prev + 1);
-    }
+  const handleToggleFollow = () => {
+    setIsFollowing((prev) => !prev);
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center pb-24">
-      {/* Header Atas */}
-      <header className="w-full h-20 sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#181D27] px-6 md:px-30 flex items-center justify-between">
+    <div className="min-h-screen bg-black text-white pb-24">
+      {/* Top Header */}
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-800 bg-black/80 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-2">
-          <img
-            src="/logo.png"
-            alt="Sociality Logo"
-            className="w-6 h-6 object-contain"
-          />
-          <span className="font-bold text-xl tracking-tight">Sociality</span>
+          <div className="h-6 w-6 rounded-full bg-white flex items-center justify-center text-black font-bold text-xs">
+            S
+          </div>
+          <span className="font-bold tracking-wide text-lg">Sociality</span>
         </div>
 
-        <div className="hidden md:flex items-center bg-[#0D0E12] border border-white/10 rounded-full px-4 py-2 w-72">
-          <Search className="w-4 h-4 text-gray-400 mr-2" />
+        <div className="relative w-64">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
           <input
             type="text"
             placeholder="Search"
-            className="bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none w-full"
+            onClick={() => router.push("/users/search")}
+            className="w-full rounded-full bg-zinc-900 py-1.5 pl-9 pr-4 text-xs text-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-700"
           />
         </div>
 
-        <div className="flex items-center gap-4">
-          <Avatar className="w-10 h-10 border border-white/20">
-            <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" />
-            <AvatarFallback>ME</AvatarFallback>
-          </Avatar>
+        <div className="h-8 w-8 rounded-full overflow-hidden bg-zinc-800">
+          <Image
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
+            alt="My Profile"
+            width={32}
+            height={32}
+            className="object-cover"
+          />
         </div>
       </header>
 
-      {/* Main Container Friends Profile */}
-      <main className="w-full max-w-203 flex flex-col items-center gap-6 p-4 mt-4">
-        {/* Tombol Back */}
-        <div className="w-full flex justify-start">
-          <button
-            onClick={() => router.back()}
-            className="text-gray-400 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back
-          </button>
-        </div>
+      {/* Main Content */}
+      <main className="mx-auto max-w-xl px-4 pt-6">
+        <button
+          onClick={() => router.back()}
+          className="mb-6 flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-white transition"
+        >
+          <ArrowLeft size={16} />
+          <span>Back</span>
+        </button>
 
-        {/* Info Pengguna & Tombol Follow/Unfollow */}
-        <div className="flex flex-col items-center gap-3 text-center">
-          <Avatar className="w-20 h-20 border-2 border-purple-500">
-            <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=faces" />
-            <AvatarFallback>
-              {username ? username.substring(0, 2).toUpperCase() : "US"}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-lg font-bold capitalize">
-              {username || "Jane Smith"}
-            </h1>
-            <p className="text-xs text-gray-400">@{username || "janesmith"}</p>
+        {/* Profile Card Info */}
+        <div className="flex flex-col items-center text-center">
+          <div className="relative mb-3 h-24 w-24 overflow-hidden rounded-full border-2 border-purple-500 p-0.5">
+            <Image
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300"
+              alt={username}
+              width={96}
+              height={96}
+              className="h-full w-full rounded-full object-cover"
+            />
           </div>
-          <p className="text-xs text-gray-300 max-w-md">
+
+          <h2 className="text-xl font-bold capitalize">{username}</h2>
+          <span className="text-xs text-zinc-500">@{username}</span>
+
+          <p className="mt-3 max-w-md text-xs text-zinc-300">
             Digital creator & travel enthusiast ✨ Exploring the world one photo
             at a time.
           </p>
 
-          <Button
-            onClick={handleFollowToggle}
-            className={`h-9 px-6 rounded-xl text-xs font-medium mt-1 flex items-center gap-1.5 transition-all ${
+          <button
+            onClick={handleToggleFollow}
+            className={`mt-4 rounded-full px-6 py-2 text-xs font-semibold transition ${
               isFollowing
-                ? "bg-transparent border border-white/20 text-gray-300 hover:bg-white/10"
-                : "bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white shadow-lg"
+                ? "border border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+                : "bg-white text-black hover:bg-zinc-200"
             }`}
           >
-            {isFollowing ? (
-              <>
-                <UserCheck className="w-4 h-4" />
-                Following
-              </>
-            ) : (
-              <>
-                <UserPlus className="w-4 h-4" />
-                Follow
-              </>
-            )}
-          </Button>
+            {isFollowing ? "✓ Following" : "Follow"}
+          </button>
         </div>
 
-        {/* Statistik Profil (Post, Followers, Following, Likes) */}
-        <div className="w-full grid grid-cols-4 gap-2 bg-[#0D0E12] border border-white/10 rounded-2xl py-4 px-6 text-center my-2">
-          <div className="flex flex-col">
-            <span className="font-bold text-base">{userPosts.length}</span>
-            <span className="text-[11px] text-gray-400">Post</span>
+        {/* Stats Grid */}
+        <div className="mt-8 grid grid-cols-4 rounded-2xl border border-zinc-800/80 bg-zinc-950/50 py-4 text-center">
+          <div>
+            <p className="text-base font-bold">4</p>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">
+              Post
+            </p>
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-base">{followerCount}</span>
-            <span className="text-[11px] text-gray-400">Followers</span>
+          <div>
+            <p className="text-base font-bold">125</p>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">
+              Followers
+            </p>
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-base">89</span>
-            <span className="text-[11px] text-gray-400">Following</span>
+          <div>
+            <p className="text-base font-bold">89</p>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">
+              Following
+            </p>
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-base">312</span>
-            <span className="text-[11px] text-gray-400">Likes</span>
-          </div>
-        </div>
-
-        {/* Header Tab Gallery */}
-        <div className="w-full flex border-b border-white/10">
-          <div className="pb-3 text-xs font-semibold flex items-center justify-center gap-2 border-b-2 border-purple-500 text-white w-full">
-            <Grid className="w-4 h-4" /> Gallery
+          <div>
+            <p className="text-base font-bold">312</p>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5">
+              Likes
+            </p>
           </div>
         </div>
 
-        {/* Grid Gallery Posts */}
-        <div className="w-full grid grid-cols-3 gap-3">
-          {userPosts.map((imgUrl, index) => (
-            <div
-              key={index}
-              onClick={() => router.push(`/posts/${index + 1}`)}
-              className="aspect-square bg-gray-900 rounded-xl overflow-hidden border border-white/10 group relative cursor-pointer"
-            >
-              <img
-                src={imgUrl}
-                alt={`Post ${index}`}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-          ))}
+        {/* Gallery Tab */}
+        <div className="mt-8 border-t border-zinc-800 pt-4">
+          <div className="flex items-center justify-center gap-2 border-b-2 border-purple-500 pb-2 text-xs font-semibold text-white">
+            <Grid size={16} />
+            <span>Gallery</span>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {[
+              "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500",
+              "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=500",
+              "https://images.unsplash.com/photo-1476514525535-ce74f45814d3?w=500",
+              "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=500",
+            ].map((url, idx) => (
+              <div
+                key={idx}
+                className="relative aspect-square overflow-hidden rounded-lg bg-zinc-900"
+              >
+                <Image
+                  src={url}
+                  alt={`Gallery image ${idx}`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </main>
 
-      {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-[#0A0D12]/95 backdrop-blur-md border-t border-[#181D27] py-3 px-6 flex items-center justify-around max-w-md mx-auto rounded-t-2xl shadow-lg">
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center justify-around rounded-full border border-zinc-800 bg-zinc-950/90 px-6 py-3 backdrop-blur w-80">
         <button
           onClick={() => router.push("/feed")}
-          className="text-gray-400 hover:text-white flex flex-col items-center"
+          className="text-zinc-400 hover:text-white transition"
         >
-          <Home className="w-6 h-6" />
+          <Home size={20} />
         </button>
         <button
           onClick={() => router.push("/users/search")}
-          className="text-gray-400 hover:text-white flex flex-col items-center"
+          className="text-zinc-400 hover:text-white transition"
         >
-          <Search className="w-6 h-6" />
+          <Search size={20} />
         </button>
         <button
           onClick={() => router.push("/create")}
-          className="text-gray-400 hover:text-white flex flex-col items-center"
+          className="text-zinc-400 hover:text-white transition"
         >
-          <PlusSquare className="w-6 h-6" />
+          <PlusSquare size={20} />
         </button>
         <button
           onClick={() => router.push("/profile")}
-          className="text-gray-400 hover:text-white flex flex-col items-center"
+          className="text-zinc-400 hover:text-white transition"
         >
-          <UserIcon className="w-6 h-6" />
+          <User size={20} />
         </button>
       </nav>
     </div>
+  );
+}
+
+export default function FriendsProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <FriendsProfileContent />
+    </Suspense>
   );
 }

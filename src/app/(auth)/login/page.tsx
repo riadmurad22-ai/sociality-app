@@ -56,7 +56,7 @@ export default function LoginPage() {
       <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-112.5 h-75 bg-purple-600/40 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Card Form Utama */}
-      <div className="relative z-10 w-full max-w-86.25 bg-black/40 backdrop-blur-md rounded-[16px] border border-white/10 p-[32px_16px] flex flex-col gap-4 shadow-2xl my-8">
+      <div className="relative z-10 w-full max-w-86.25 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-8 flex flex-col gap-4 shadow-2xl my-8">
         {/* Header / Logo */}
         <div className="flex flex-col items-center justify-center text-center gap-2 mb-1">
           <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white font-medium rounded-full h-10 mt-2 transition-all"
+            className="w-full bg-[#6C5CE7] hover:bg-[#5b4cc4] text-white font-medium rounded-full h-10 mt-2 transition-all cursor-pointer"
           >
             {isLoading ? "Processing..." : "Submit"}
           </Button>
